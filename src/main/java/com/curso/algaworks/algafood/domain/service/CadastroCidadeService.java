@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.curso.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.curso.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.curso.algaworks.algafood.domain.model.Cidade;
+import com.curso.algaworks.algafood.domain.model.Estado;
 import com.curso.algaworks.algafood.domain.repository.CidadeRepository;
 
 @Service
@@ -15,11 +16,21 @@ public class CadastroCidadeService {
 	
 	private static final String MSG_CIDADE_EM_USO = "Cidade de Código %d não pode ser removida, pois está em uso";
 	private static final String MSG_CIDADE_NAO_ENCONTRADA = "Não existe um cadastro de Cidade com código %d";
+	
 	@Autowired
 	private CidadeRepository cidadeRepository;
+	
+	@Autowired
+	private CadastroEstadoService cadastroEstado;
 
 	public Cidade salvar(Cidade cidade) {
-		return cidadeRepository.save(cidade);
+	    Long estadoId = cidade.getEstado().getId();
+
+	    Estado estado = cadastroEstado.buscarOuFalhar(estadoId);
+
+	    cidade.setEstado(estado);
+	    
+	    return cidadeRepository.save(cidade);
 	}
 	
 	public void excluir(Long cidadeId) {
